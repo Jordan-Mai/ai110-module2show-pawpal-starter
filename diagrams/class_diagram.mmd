@@ -1,0 +1,26 @@
+```mermaid
+classDiagram
+    class Owner {
+        +String name
+    }
+
+    class Pet {
+        +String name
+        +Owner owner
+    }
+
+    class Schedule {
+        +String name
+        +Owner owner
+    }
+
+    class Task {
+        +int duration
+        +String priority
+        +String item
+    }
+
+    Owner "1" --> "1" Pet : owns
+    Pet "1" --> "*" Schedule : has
+    Schedule "1" --> "*" Task : includes
+```
