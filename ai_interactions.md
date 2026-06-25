@@ -44,7 +44,7 @@ Verified with pytest: 2 passed
 **What did you have to verify or fix manually?**
 
 <!-- Describe anything the agent got wrong or that required human review -->
-
+The AI agent did have a couple issues with importing certain files, but they were easily fixed.
 ---
 
 ## Prompt Comparison (SF11)
@@ -53,13 +53,12 @@ Verified with pytest: 2 passed
 
 | | Option A | Option B |
 |-|----------|----------|
-| **Model / tool used** | | |
-| **Prompt** | | |
-| **Response summary** | | |
-| **What was useful** | | |
-| **Problems noticed** | | |
-| **Decision** | | |
+| **Model / tool used** | GitHub Copilot | Claude |
+| **Prompt** | Same multi-step scheduling task prompts | Same multi-step scheduling task prompts |
+| **Response summary** | Generated scheduler classes, Streamlit integration, and test cases; produced working implementation | Generated scheduler classes, Streamlit integration, and test cases; produced working implementation |
+| **What was useful** | Clear class structure and algorithm implementation; tests passed with minimal fixes | Readable docstrings, detailed explanations of patterns, and robust error handling |
+| **Problems noticed** | Minor import/module path issues requiring manual fixes | None: all code worked as expected |
+| **Decision** | Chose Copilot approach for final implementation | - |
 
 **Which approach did you use in your final implementation and why?**
-
-<!-- Your conclusion -->
+I went with Copilot's approach. Both agents produced similar-quality results with comparable scheduling logic and test coverage. However, Copilot's output was slightly cleaner and required fewer manual adjustments, making it the practical choice for rapid iteration. The minor import fixes were trivial and the end result was equally good.

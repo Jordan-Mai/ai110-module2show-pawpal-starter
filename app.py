@@ -90,26 +90,43 @@ if st.button("Add task"):
 
 current_pet = st.session_state.get("pet")
 if current_pet and current_pet.tasks:
-    st.write("Current tasks:")
-    for index, task in enumerate(current_pet.tasks):
-        row1, row2, row3, row4 = st.columns([4, 2, 2, 1])
-        row1.markdown(f"**{task.title}**")
-        row2.write(f"{task.duration_minutes} min")
-        row3.write(task.priority.capitalize())
-        if row4.button("Delete", key=f"delete-{index}"):
-            current_pet.tasks.pop(index)
+    scheduler = Scheduler()
+    sorted_tasks = scheduler.sort_by_time(current_pet.tasks)
+    
+    st.subheader("Current Tasks")
+    task_data = []
+    for index, task in enumerate(sorted_tasks):
+        original_idx = current_pet.tasks.index(task)
+        task_data.append({
+            "Title": task.title,
+            "Duration (min)": task.duration_minutes,
+            "Priority": task.priority.upper(),
+            "Time": task.time or "—",
+            "Recurrence": task.recurrence or "—",
+        })
+    
+    st.dataframe(
+        task_data,
+        use_container_width=True,
+        hide_index=True,
+    )
+    
+    col_a, col_b = st.columns([4, 1])
+    with col_b:
+        if st.button("Clear all tasks"):
+            current_pet.tasks.clear()
             st.experimental_rerun()
 elif st.session_state.tasks:
     # Fallback to legacy storage (list of dicts)
-    st.write("Current tasks:")
+    st.info("📋 **Legacy tasks (dict format)**")
+    task_data = []
     for index, task in enumerate(st.session_state.tasks):
-        row1, row2, row3, row4 = st.columns([4, 2, 2, 1])
-        row1.markdown(f"**{task['title']}**")
-        row2.write(f"{task['duration_minutes']} min")
-        row3.write(task["priority"].capitalize())
-        if row4.button("Delete", key=f"delete-legacy-{index}"):
-            st.session_state.tasks.pop(index)
-            st.experimental_rerun()
+        task_data.append({
+            "Title": task["title"],
+            "Duration (min)": task["duration_minutes"],
+            "Priority": task["priority"].upper(),
+        })
+    st.dataframe(task_data, use_container_width=True, hide_index=True)
 else:
     st.info("No tasks yet. Add one above.")
 
@@ -145,6 +162,14 @@ if st.button("Generate schedule"):
             ]
 
         scheduler = Scheduler()
+        
+        # Check for conflicts and display warnings
+        conflicts = scheduler.detect_conflicts(tasks)
+        if conflicts:
+            with st.warning("⚠️ Time conflicts detected:"):
+                for warning in conflicts:
+                    st.write(f"- {warning}")
+        
         schedule = scheduler.build_schedule(owner=owner, pet=pet, tasks=tasks)
         st.session_state.schedule = schedule
     except ValueError as validation_error:
@@ -158,20 +183,52 @@ if st.session_state.schedule:
     st.markdown("---")
 
     if schedule.entries:
+        st.success(f"✅ Scheduled {len(schedule.entries)} task(s) for {schedule.pet.name}")
         st.markdown("### Planned Tasks")
+        
+        plan_data = []
         for entry in schedule.entries:
-            st.write(
-                f"{entry.start_time} — **{entry.task.title}** "
-                f"({entry.task.duration_minutes} min, priority: {entry.task.priority})"
-            )
+            plan_data.append({
+                "Time": entry.start_time,
+                "Task": entry.task.title,
+                "Duration (min)": entry.task.duration_minutes,
+                "Priority": entry.task.priority.upper(),
+                "Pet": entry.task.pet_name or "—",
+            })
+        
+        st.dataframe(
+            plan_data,
+            use_container_width=True,
+            hide_index=True,
+            column_config={
+                "Time": st.column_config.TextColumn(width="small"),
+                "Priority": st.column_config.TextColumn(width="small"),
+            },
+        )
     else:
-        st.info("No tasks could be scheduled for today.")
+        st.info("ℹ️ No tasks could be scheduled within the available time.")
 
     if schedule.skipped_tasks:
+        st.warning(f"⚠️ {len(schedule.skipped_tasks)} task(s) could not be scheduled")
         st.markdown("### Skipped Tasks")
-        for task in schedule.skipped_tasks:
-            st.write(f"- {task.title} ({task.duration_minutes} min, priority: {task.priority})")
+        # Sort skipped tasks by priority for better visibility
+        sorted_skipped = scheduler.sort_by_time(schedule.skipped_tasks)
+        
+        skipped_data = []
+        for task in sorted_skipped:
+            skipped_data.append({
+                "Task": task.title,
+                "Duration (min)": task.duration_minutes,
+                "Priority": task.priority.upper(),
+                "Pet": task.pet_name or "—",
+            })
+        
+        st.dataframe(
+            skipped_data,
+            use_container_width=True,
+            hide_index=True,
+            column_config={"Priority": st.column_config.TextColumn(width="small")},
+        )
 
-    st.markdown("### Reasoning")
-    for line in schedule.explanation.split("\n"):
-        st.write(line)
+    st.markdown("### Schedule Explanation")
+    st.info(schedule.explanation)

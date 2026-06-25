@@ -6,21 +6,59 @@ classDiagram
 
     class Pet {
         +String name
+        +String species
         +Owner owner
-    }
-
-    class Schedule {
-        +String name
-        +Owner owner
+        +List~Task~ tasks
+        +add_task(Task) void
     }
 
     class Task {
-        +int duration
+        +String title
+        +int duration_minutes
         +String priority
-        +String item
+        +bool completed
+        +String time (optional)
+        +String recurrence (optional)
+        +String pet_name (optional)
+        +datetime due_date (optional)
+        +mark_complete() Optional~Task~
+        +priority_value() int
+        +priority_label() String
     }
 
-    Owner "1" --> "1" Pet : owns
-    Pet "1" --> "*" Schedule : has
-    Schedule "1" --> "*" Task : includes
+    class ScheduledTask {
+        +Task task
+        +String start_time
+        +String end_time
+    }
+
+    class Schedule {
+        +Owner owner
+        +Pet pet
+        +List~ScheduledTask~ entries
+        +List~Task~ skipped_tasks
+        +String explanation
+        +String start_time
+        +total_planned_minutes() int
+        +summary_lines() List~String~
+    }
+
+    class Scheduler {
+        +String start_time
+        +int available_minutes
+        +build_schedule(Owner, Pet, List~Task~) Schedule
+        +sort_by_time(List~Task~) List~Task~
+        +detect_conflicts(List~Task~) List~String~
+        +filter_tasks(List~Task~, bool, String) List~Task~
+    }
+
+    Owner "1" --> "1..*" Pet : owns
+    Pet "1" --> "0..*" Task : has
+    Scheduler --> "0..1" Schedule : builds
+    Schedule "1" --> "0..*" ScheduledTask : contains
+    Schedule "1" --> "0..*" Task : skips
+    ScheduledTask "1" --> "1" Task : wraps
+    Schedule "1" --> "1" Pet : plans_for
+    Schedule "1" --> "1" Owner : plans_for
+    Task "1" --> "0..1" Task : recurrence_creates
 ```
