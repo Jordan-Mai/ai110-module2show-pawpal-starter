@@ -6,11 +6,13 @@
 
 - Briefly describe your initial UML design.
 - What classes did you include, and what responsibilities did you assign to each?
+I included an Owner, Pet, Schedule, and Task class. Each class manages its own data, and utilizes other classes in order to fulfill its requirements.
 
 **b. Design changes**
 
 - Did your design change during implementation?
 - If yes, describe at least one change and why you made it.
+My design didn't change during implementation.
 
 ---
 

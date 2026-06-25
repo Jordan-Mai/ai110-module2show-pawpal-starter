@@ -54,6 +54,30 @@ Paste a sample of your app's CLI or Streamlit output here so a reader can see wh
 #   ...
 ```
 
+Today's Schedule
+==================
+
+Mochi (dog) - Owner: Jordan
+  08:00 - 08:10: Feeding (10 min) [priority: high]
+  08:10 - 08:40: Morning walk (30 min) [priority: high]
+  08:40 - 08:45: Refill water (5 min) [priority: low]
+
+  Reasoning:
+   Daily plan starts at 08:00 for 3 task(s).
+   Available day length: 120 minutes.
+   Scheduled 3 task(s): Feeding, Morning walk, Refill water.
+
+
+Biscuit (cat) - Owner: Jordan
+  08:00 - 08:05: Medication (5 min) [priority: high]
+  08:05 - 08:30: Playtime (25 min) [priority: medium]
+  08:30 - 09:10: Grooming (40 min) [priority: medium]
+
+  Reasoning:
+   Daily plan starts at 08:00 for 3 task(s).
+   Available day length: 120 minutes.
+   Scheduled 3 task(s): Medication, Playtime, Grooming.
+
 ## 🧪 Testing PawPal+
 
 ```bash
